@@ -1,0 +1,24 @@
+{
+    "name": "fake-customers",
+    "version": "1.0.0",
+    "description": "Generates a list of fake customers in csv format.",
+    "main": "index.js",
+    "scripts": {
+        "test": "jest --watchAll"
+    },
+    "keywords": [
+        "dumby-data"
+    ],
+    "author": "Brandon Johnson",
+    "license": "MIT",
+    "dependencies": {
+        "common-last-names": "^1.1.3",
+        "human-names": "^1.0.11"
+    },
+    "devDependencies": {
+        "cat-names": "^3.0.0",
+        "dog-breeds": "^1.0.0",
+        "dog-names": "^2.0.0",
+        "jest": "^26.4.2"
+    }
+}
