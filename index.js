@@ -131,13 +131,9 @@ function generateRows() {
         row.push(animal);
         row.push(breed.replace(", ", " "));
         let mobile = generatePhoneNumber(mobileNums);
-        row.push(mobile);
+        row.push(...mobile);
         mobileNums.add(mobile);
-        // console.log(row);
         rows.push(row);
-        if (i % 10000 == 0) {
-            console.log(i);
-        }
     }
     return rows;
 }
@@ -159,12 +155,17 @@ function generatePhoneNumber(curNums) {
         return num;
     }
     let inserted = false;
+    let group = [];
     while (inserted === false) {
         number = `(${random(3)}) ${random(3)}-${random(4)}`;
         if (!numbers.has(number)) {
             numbers.add(number);
+            group.push(number);
+            // console.log(group);
+        }
+        if (group.length === 3) {
             inserted = true;
-            return number;
+            return group;
         }
     }
 }
