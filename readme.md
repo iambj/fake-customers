@@ -15,3 +15,4 @@ This can be adjusted easily to fit your needs, or to just generate some names or
 -   [x] at least 5000
 -   [ ] Command line arguments (for example number of rows, output file name, or a custom format)
 -   [ ] Document the four different functions in the README
+-   [ ] Better support for standalone use (i.e. number of items to generate)
