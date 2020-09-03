@@ -61,7 +61,8 @@ function generateRows(totalRows) {
 }
 
 // Returns an array with firstname, lastname
-function generateName(names) {
+function generateName(usedNames) {
+    let names = new Set(usedNames);
     let first = "";
     let last = "";
     let inserted = false;
