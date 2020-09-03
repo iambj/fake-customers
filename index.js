@@ -61,7 +61,8 @@ function generateRows(totalRows) {
 }
 
 // Returns an array with firstname, lastname
-function generateName(names) {
+function generateName(usedNames) {
+    let names = new Set(usedNames);
     let first = "";
     let last = "";
     let inserted = false;
@@ -79,7 +80,7 @@ function generateName(names) {
 }
 
 function generatePet() {
-    // Returns an object with a name and breed.
+    // Returns an object with a name and breed. Names are not unique.
     // Pick between a dog or cat, dogs are much more common
     let animal = _b.pickOne([
         { item: "dog", weight: 7 },

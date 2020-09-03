@@ -1,6 +1,6 @@
 {
     "name": "fake-customers",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "Generates a list of fake customers in csv format.",
     "main": "index.js",
     "scripts": {
