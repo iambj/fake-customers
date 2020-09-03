@@ -7,7 +7,7 @@
         "test": "jest --watchAll"
     },
     "keywords": [
-        "dumby-data"
+        "dumby data, fake customers, filler data"
     ],
     "author": "Brandon Johnson",
     "license": "MIT",

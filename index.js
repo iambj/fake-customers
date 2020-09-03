@@ -3,165 +3,114 @@ const lastNames = require("common-last-names");
 const dogNames = require("dog-names");
 const catNames = require("cat-names");
 const dogBreeds = require("dog-breeds");
-
+const _b = require("blitu");
 const fs = require("fs");
 
 const ROWS = 5000;
 
-let data = [];
+// Demo:
+//generateCSV(_b.benchmark(generateRows, [ROWS], "all"));
 
-// First Name	Last Name	Pets Names	Breed	Home Phone	Mobile Phone	?	Notes
+function generateCSV(rows) {
+    let csv = "";
+    // Create the .csv with a trailing newline
+    rows.forEach((r, i) => {
+        let row = r.join(",");
+        csv += `${row}\r\n`;
+    });
 
-function shuffleArray(orderedArr) {
-    let newArr = [];
-    while (orderedArr.length > 0) {
-        let pick = Math.floor(Math.random() * orderedArr.length);
-        let items = orderedArr.splice(pick, 1)[0];
-        newArr.push(items);
-    }
-    return newArr;
+    fs.writeFileSync("./output/customers.csv", csv);
 }
 
-function pickOne(objs) {
-    // TODO: Use a default of weight:1 if it is omitted.
-    // Pass a simple array or pass in a array of objects to
-    // with weights: { toBePicked: weight: 1}
-    // 1 is default for all and is the standard
-    if (!objs || objs.length === 0) return null;
-    // console.log("picking");
-    if (Array.isArray(objs)) {
-        // console.log("array given");
-        if (typeof objs[0] === "object") {
-            // console.log("weighted");
-            // Get name of item to be picked.
-            // Only two properties are allowed,
-            // and one must be "weight"
-            let propName = "";
-            for (const [i, k] of objs.entries()) {
-                let count = 0;
-                let weightIncluded = false;
+// Row Format:
+// First Name	Last Name	Pets Names	Breed	Home Phone	Mobile Phone   Additional Phone    Notes
 
-                for (const j in k) {
-                    count++;
-                    if (k.hasOwnProperty(j)) {
-                        if (j === "weight") {
-                            weightIncluded = true;
-                        } else {
-                            propName = j;
-                        }
-                    }
-                }
-                if (!weightIncluded) throw new Error("Weight not included.");
-                if (count > 2) {
-                    throw new Error("Too many items in objects to pick from.");
-                }
-            }
+// This would be a good practice script to work with concurrency or node.js performance.
+// The major slow down is that it only uses unique values for names and phone numbers.
 
-            let weightedArr = [];
-            for (const i of objs) {
-                let weight = i.weight;
-                let arr = new Array(weight).fill(i[propName]);
-                weightedArr.push(...arr);
-            }
-
-            let selection = Math.floor(Math.random() * objs.length);
-            let shuffled = shuffleArray(weightedArr);
-            return shuffled[selection];
-        } else {
-            let selection = Math.floor(Math.random() * objs.length);
-            return objs[selection];
-        }
-    } else {
-        throw new Error("An array is needed as input");
-    }
-}
-
-let arr1 = [
-    { item: "A", weight: 1 },
-    { item: "B", weight: 10 },
-    { item: "C", weight: 1 },
-    { item: "D", weight: 1 },
-    { item: "E", weight: 1 },
-];
-let arr2 = ["A", "B", "C"];
-
-// console.log(pickOne(arr1));
-// console.log(pickOne(arr2));
-
-function generateRows() {
+// Main function to generate a rows of customers
+function generateRows(totalRows) {
     let rows = [];
-    let names = new Set();
-    let mobileNums = new Set();
-    // let totalDupes = 0;
-    for (let i = 0; i < ROWS; i++) {
-        let row = [];
-        let first = "";
-        let last = "";
-        let inserted = false;
-        while (inserted === false) {
-            // console.log("making name...");
-            // First name
-            first = humanNames.allRandom();
-            // Last name
-            last = lastNames.random();
-            if (!names.has(`${first} ${last}`)) {
-                names.add(`${first} ${last}`);
-                // Add to row
-                row.push(first);
-                row.push(last);
-                inserted = true;
-            } else {
-                // console.log("dupe name");
-                // totalDupes++;
-            }
-        }
+    let names = new Set(); // Holds full list of Firstname Lastname to check against for uniqueness
+    let numbers = new Set(); // Holds full list of phone number to check against for uniqueness
+    for (let i = 0; i < totalRows; i++) {
+        let row = []; // Current customer (row)
+
+        // Unique Names:
+        let name = generateName(names);
+        names.add(`${name[0]} ${name[1]}`); // Add name to master list
+        row.push(...name); // Add to current row
+
         // Pet Name and breed
-        let animal = pickOne([
-            { item: "dog", weight: 7 },
-            { item: "cat", weight: 1 },
-        ]);
-        let breed = "";
-        if (animal === "dog") {
-            animal = dogNames.allRandom();
-            breed = dogBreeds.random().name;
-        } else {
-            animal = catNames.random();
-            breed = "Cat";
-        }
-        row.push(animal);
-        row.push(breed.replace(", ", " "));
-        let mobile = generatePhoneNumber(mobileNums);
-        row.push(...mobile);
-        mobileNums.add(mobile);
+        let { petName, breed } = generatePet();
+        row.push(petName);
+        row.push(breed.replace(", ", " ")); // Remove commas to clean up issues with generating the CSV
+
+        // Phone numbers - home, mobile, alternative
+        let numList = generatePhoneNumber(numbers); // Returns an array of 3 phone numbers
+        row.push(...numList);
+        numbers.add(numList); // Add numbers to master list
+
+        // Generate a \n delimited list of notes to mimic the current data situation
+        row.push(`"${generateNotes()}"`);
+
+        // Add all row data to the main list
         rows.push(row);
     }
     return rows;
 }
 
-let startTime = Date.now();
+// Returns an array with firstname, lastname
+function generateName(names) {
+    let first = "";
+    let last = "";
+    let inserted = false;
+    // Find unique names
+    while (inserted === false) {
+        // First name
+        first = humanNames.allRandom();
+        // Last name
+        last = lastNames.random();
+        if (!names.has(`${first} ${last}`)) {
+            inserted = true;
+            return [first, last];
+        }
+    }
+}
 
-//* slow =(
+function generatePet() {
+    // Returns an object with a name and breed.
+    // Pick between a dog or cat, dogs are much more common
+    let animal = _b.pickOne([
+        { item: "dog", weight: 7 },
+        { item: "cat", weight: 1 },
+    ]);
+    let breed = "";
+    // Pick a name based on the animal, use "Cat" as a breed for cats.
+    if (animal === "dog") {
+        animal = dogNames.allRandom();
+        breed = dogBreeds.random().name;
+    } else {
+        animal = catNames.random();
+        breed = "Cat";
+    }
+    return { petName: animal, breed };
+}
 
+// TODO extract random as randomInt(length)
 function generatePhoneNumber(curNums) {
-    // Generate a random of a certain amount of digits
     let numbers = new Set(curNums);
     let number = "";
 
-    function random(count) {
-        let num = "";
-        for (let i = 0; i < count; i++) {
-            num += Math.floor(Math.random() * Math.floor(9));
-        }
-        return num;
-    }
     let inserted = false;
     let group = [];
     while (inserted === false) {
-        number = `(${random(3)}) ${random(3)}-${random(4)}`;
+        number = `(${_b.randomIntOfLength(3)}) ${_b.randomIntOfLength(
+            3
+        )}-${_b.randomIntOfLength(4)}`;
         if (!numbers.has(number)) {
             numbers.add(number);
             group.push(number);
-            // console.log(group);
         }
         if (group.length === 3) {
             inserted = true;
@@ -170,23 +119,57 @@ function generatePhoneNumber(curNums) {
     }
 }
 
-// for (let i = 0; i < 500000; i++) {
-//     console.log(generatePhoneNumber([]), i);
-// }
+// Generate a fake history of notes, delimited by newlines
+function generateNotes() {
+    let notesArr = [];
+    for (let i = 0; i < _b.randomInRange(6, 20); i++) {
+        let possibleNotes = [
+            "bath and nails",
+            `${_b.randomInRange(0, 8)} body ${_b.randomInRange(
+                0,
+                8
+            )} tail ${_b.randomInRange(0, 8)} face`,
+            `skunk bath`,
+            `trim and bath`,
+            `bath`,
+            `nails`,
+            `no show`,
+        ];
+        let note = _b.pickOne(possibleNotes);
+        let price = `$${_b.randomInRange(25, 60)}`;
+        let date = new Date(
+            `${_b.padNumber(_b.randomInRange(2, 12), 4)}/${_b.randomInRange(
+                10,
+                28
+            )}/${_b.randomInRange(2000, 2020)}`
+        );
+        let row = {
+            date,
+            msg: `\t${_b.padText(note, 30)}\t\t${price}`,
+        };
+        notesArr.push(row);
+    }
+    // Sort notesArr based on date
+    let sortedRows = notesArr.sort((a, b) => {
+        // Sort ascending. If f(a,b) < 0, a comes first.
+        return a.date - b.date;
+    });
 
-let rows = generateRows();
-let csv = "";
-// Create the .csv with a trailing newline
-rows.forEach((r, i) => {
-    let row = r.join(", ");
-    // console.log(row);
-    csv += `${row}\n`;
-});
+    let sortedStrings = sortedRows.map((r) => {
+        // Clean up basic date format, add padding
+        let date = r.date.toLocaleString().split(",")[0];
+        let month = _b.padNumber(date.split("/")[0], 2);
+        let day = _b.padNumber(date.split("/")[1], 2);
+        let year = date.split("/")[2];
+        return `${month}/${day}/${year}\t${r.msg}`;
+    });
+    // Join into one solid \n delimited string to mimic what currently is used
+    return sortedStrings.join("\r\n");
+}
 
-// console.log(csv);
-fs.writeFileSync("./output/customers.csv", csv);
-
-let endTime = Date.now();
-console.log(`Time: ${(endTime - startTime) / 1000}s`);
-
-module.exports.pickOne = pickOne;
+module.exports = {
+    generateName,
+    generatePhoneNumber,
+    generatePet,
+    generateNotes,
+};
