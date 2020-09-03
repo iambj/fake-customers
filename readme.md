@@ -2,7 +2,7 @@
 
 This will generate a .csv of fake customer data. The format mimics a database for my family's business. We are looking at new CRMs and didn't want use our customer's data in apps we weren't going to ultimately use.
 
-This can be adjusted easily to fit your needs, or to just generate some names phone numbers.
+This can be adjusted easily to fit your needs, or to just generate some names or phone numbers.
 
 ## Todo
 
