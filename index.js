@@ -6,10 +6,10 @@ const dogBreeds = require("dog-breeds");
 const _b = require("blitu");
 const fs = require("fs");
 
-const ROWS = 5000;
+const ROWS = 50;
 
 // Demo:
-//generateCSV(_b.benchmark(generateRows, [ROWS], "all"));
+// generateCSV(_b.benchmark(generateRows, [ROWS], "all"));
 
 function generateCSV(rows) {
     let csv = "";

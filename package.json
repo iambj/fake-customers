@@ -1,10 +1,11 @@
 {
     "name": "fake-customers",
-    "version": "1.0.1",
+    "version": "1.0.3",
     "description": "Generates a list of fake customers in csv format.",
     "main": "index.js",
     "scripts": {
-        "test": "jest --watchAll"
+        "test": "jest --watchAll",
+        "pipelineTest": "jest"
     },
     "keywords": [
         "dumby data, fake customers, filler data"
@@ -21,5 +22,16 @@
     },
     "devDependencies": {
         "jest": "^26.4.2"
-    }
+    },
+    "directories": {
+        "test": "tests"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/iambj/fake-customers.git"
+    },
+    "bugs": {
+        "url": "https://github.com/iambj/fake-customers/issues"
+    },
+    "homepage": "https://github.com/iambj/fake-customers#readme"
 }
