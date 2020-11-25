@@ -16,3 +16,4 @@ This can be adjusted easily to fit your needs, or to just generate some names or
 -   [ ] Command line arguments (for example number of rows, output file name, or a custom format)
 -   [ ] Document the four different functions in the README
 -   [ ] Better support for standalone use (i.e. number of items to generate)
+-   [ ] Rewrite parts in Rust (for speed and fun)
